@@ -6,6 +6,7 @@
 package find.path;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.Scanner;
@@ -22,13 +23,26 @@ public class FindPath {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO code application logic here
-        if(true){
-        //if(!args[0].isEmpty()){
-            //String path = args[0];
-            String query = "findPath.java";
-            findPath(query);
+   
+        if(args.length > 0){
+            String query = args[0];
+            String path = findPath(query);
+            if(path == null){
+                System.out.println("File not found");
+            }else{
+                String cmd = "";
+                for(int i = 1; i < args.length; i++){
+                    cmd += args[i] + " ";
+                }
+                if(new File(path).isDirectory()){
+                    Process p = Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd " + path + " && " + cmd + " \""); 
+                }
+                
+                
+            }
+            
         }else{
             System.out.println("Enter a file or director as a valid parameter");
             System.exit(-1);
@@ -36,7 +50,7 @@ public class FindPath {
         
     }
     
-    static void findPath(String query){
+    static String findPath(String query) throws IOException{
         File root = new File(System.getProperty("user.dir"));
         queue.add(root);
         while(!queue.isEmpty()){
@@ -48,11 +62,10 @@ public class FindPath {
                 Scanner get = new Scanner(System.in);
                 while(valid_input){
                     if(get.next().toLowerCase().equals("y")){
-                    valid_input = false;
-                }else if(get.next().toLowerCase().equals("n")){
-                    valid_input = false;
-                    return;
-                }
+                        valid_input = false;
+                    }else{
+                        return current.getAbsolutePath();
+                    }
                 }
                 
             }
@@ -62,6 +75,8 @@ public class FindPath {
             }
       
         }
+        
+        return null;
         
     }
     
