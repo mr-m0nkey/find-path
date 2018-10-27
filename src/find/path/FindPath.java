@@ -6,11 +6,18 @@
 package find.path;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,19 +26,34 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class FindPath {
     
     private static Queue<File> queue = new ConcurrentLinkedQueue();
+    private static HashMap<String, String> cache_map;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
-   
+        File cache = new File("cache.dat");
+        if(!cache.exists()){
+            cache.createNewFile();
+            cache_map = new HashMap();
+        }else{
+            ObjectInputStream input = new ObjectInputStream(new FileInputStream(cache));
+            try {
+                cache_map = (HashMap<String, String>)input.readObject();
+            } catch (ClassNotFoundException ex) {
+                cache_map = new HashMap();
+                Logger.getLogger(FindPath.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         if(args.length > 0){
             String query = args[0];
             String path = findPath(query);
             if(path == null){
                 System.out.println("File not found");
             }else{
+                ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(cache));
+                output.writeObject(cache_map);
                 String cmd = "";
                 for(int i = 1; i < args.length; i++){
                     cmd += args[i] + " ";
@@ -52,6 +74,24 @@ public class FindPath {
     
     static String findPath(String query) throws IOException{
         File root = new File(System.getProperty("user.dir"));
+        //TODO: check cache from root
+        Scanner get = new Scanner(System.in);
+        if(cache_map.containsKey(query)){
+            if(new File(cache_map.get(query)).exists()){
+                System.out.println(cache_map.get(query));
+                System.out.println("Continue searching?");
+                if(get.next().toLowerCase().equals("y")){
+
+                }else{
+                    return cache_map.get(query);
+                }
+            }else{
+                cache_map.remove(query);
+            }
+                
+                
+            
+        }
         queue.add(root);
         while(!queue.isEmpty()){
             File current = queue.remove();
@@ -59,11 +99,11 @@ public class FindPath {
                 System.out.println(current.getAbsolutePath());
                 System.out.println("Continue searching? (Y/N)");
                 boolean valid_input = true;
-                Scanner get = new Scanner(System.in);
                 while(valid_input){
                     if(get.next().toLowerCase().equals("y")){
                         valid_input = false;
                     }else{
+                        cache_map.put(query, current.getAbsolutePath());
                         return current.getAbsolutePath();
                     }
                 }
