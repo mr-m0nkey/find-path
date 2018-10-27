@@ -71,7 +71,10 @@ public class FindPath {
             }
             if(current.isDirectory()){
                 File[] content = current.listFiles();
-                queue.addAll(Arrays.asList(content));
+                if(content != null){
+                    queue.addAll(Arrays.asList(content));
+                }
+                
             }
       
         }
