@@ -25,14 +25,20 @@ import java.util.logging.Logger;
  */
 public class FindPath {
     
+    //TODO: add alisasing 
+    //TODO: add multiple paths per cache location
+    //TODO: make code more structured and separate concerns
+    //TODO: add multithreading for faster searches
+    
     private static Queue<File> queue = new ConcurrentLinkedQueue();
     private static HashMap<String, String> cache_map;
 
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
-    public static void main(String[] args) throws IOException {
-        // TODO code application logic here
+    public static void main(String[] args) throws IOException{
+        
         File cache = new File("cache.dat");
         if(!cache.exists()){
             cache.createNewFile();
@@ -74,7 +80,7 @@ public class FindPath {
     
     static String findPath(String query) throws IOException{
         File root = new File(System.getProperty("user.dir"));
-        //TODO: check cache from root
+        //TODO: check cache from root so it doesn't return paths outside the workind directory
         Scanner get = new Scanner(System.in);
         if(cache_map.containsKey(query)){
             if(new File(cache_map.get(query)).exists()){
