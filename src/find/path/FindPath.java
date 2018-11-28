@@ -37,11 +37,21 @@ public class FindPath {
      * @param args the command line arguments
      * @throws java.io.IOException
      */
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
+        
+        String os = System.getProperty("os.name");
+        if(!os.toLowerCase().contains("windows")){
+            System.out.println("Sorry, this version is only supported on windows");
+            return;
+        }
         
         File cache = new File("cache.dat");
         if(!cache.exists()){
-            cache.createNewFile();
+            try {
+                cache.createNewFile();
+            } catch (IOException ex) {
+                System.out.println("Open cmd with administrative access to crawl through this directory");
+            }
             cache_map = new HashMap();
         }else{
             ObjectInputStream input = new ObjectInputStream(new FileInputStream(cache));
@@ -65,7 +75,7 @@ public class FindPath {
                     cmd += args[i] + " ";
                 }
                 if(new File(path).isDirectory()){
-                    Process p = Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd " + path + " && " + cmd + " \""); 
+                    Process p = Runtime.getRuntime().exec("cd " + path + " && " + cmd + " \""); 
                 }
                 
                 
